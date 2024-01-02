@@ -1,4 +1,5 @@
 #include "Event.h"
+#include "Config.h"
 
 namespace Events
 {
@@ -12,7 +13,7 @@ namespace Events
 			mainMenuClosed = true;
 		}
 		if (a_event.menuName == "PauseMenu" and a_event.opening) {
-			//Config::ReadIni();
+			Config::ReadIni();
 		}
 		if (a_event.menuName == "LoadingMenu" and !a_event.opening) {
 			if (mainMenuClosed) {

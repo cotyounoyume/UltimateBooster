@@ -5,7 +5,7 @@ namespace Utility
 	void ExecuteCommandString(std::string command, std::string displayPrefix)
 	{
 		ExecuteCommand(0, command.data());
-		Info(displayPrefix + command);
+		Debug(displayPrefix + command);
 	}
 
 	void ExecuteCommandStringOnFormID(int formID, std::string subCommand)
@@ -323,6 +323,16 @@ namespace Utility
 			return nullptr;
 		}
 		return form2;
+	}
+
+	RE::TESGlobal* GetGlobalFromString(std::string editorID)
+	{
+		auto form = RE::TESForm::LookupByEditorID<RE::TESGlobal>(editorID.c_str());
+		if (!form) {
+			Error(fmt::format("GlobalVariable({}) was not found.", editorID));
+			return nullptr;
+		}
+		return form;
 	}
 
 	std::string GetFormIDsFromVector(std::vector<int> list, std::string separator, bool quoteOn, bool hexOn)

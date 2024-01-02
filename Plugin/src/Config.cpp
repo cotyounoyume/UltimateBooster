@@ -64,6 +64,11 @@ If you are unsure, please re-download the file for this mod or otherwise restore
 			for (auto itr = (*intMap).begin(); itr != (*intMap).end(); ++itr) {
 				ReadConfigInt(category, itr->first);
 			}
+
+			auto floatMap = GetFloatMapByCategory(category);
+			for (auto itr = (*floatMap).begin(); itr != (*floatMap).end(); ++itr) {
+				ReadConfigFloat(category, itr->first);
+			}
 		}
 		//DumpSettings();
 		U::SetLogLevel(GetLogLevel());
@@ -90,18 +95,31 @@ If you are unsure, please re-download the file for this mod or otherwise restore
 	}
 
 	//GeneralMajor
-	std::string GetTestKey() { return SettingsStringMapGeneralMajor["TestKey"]; }
+	std::string GetSpeedManagerKey() { return SettingsStringMapGeneralMajor["SpeedManagerKey"]; }
+	std::string GetEffectFormID() { return SettingsStringMapGeneralMajor["EffectShaderFormIDForSpeedUp"]; }
 
-	char GetTestKeyNumber()
+	char GetSpeedManagerKeyNumber()
 	{
-		return SettingsStringMapGeneralMajor["TestKey"].c_str()[0];
+		return SettingsStringMapGeneralMajor["SpeedManagerKey"].c_str()[0];
 	}
 
-	bool GetTestOn() { return SettingsBoolMapGeneralMajor["TestOn"]; }
+	bool GetEffectEnabled() { return SettingsBoolMapGeneralMajor["EffectShaderForSpeedupOn"]; }
 
-	int GetTestNum() { return SettingsIntMapDebug["TestNum"]; }
+	double GetMultiplierMinThreshold() { return SettingsFloatMapGeneralMajor["MultiplierMinThreshold"]; }
+	double GetMultiplierMaxThreshold() { return SettingsFloatMapGeneralMajor["MultiplierMaxThreshold"]; }
+	double GetMultiplierDownRate() { return SettingsFloatMapGeneralMajor["MultiplierDownRate"]; }
+	double GetMultiplierUpRate() { return SettingsFloatMapGeneralMajor["MultiplierUpRate"]; }
+	double GetCrouchPowerRatio() { return SettingsFloatMapGeneralMajor["CrouchPowerRatio"]; }
+	double GetFallspeedMultiplierMinThreshold() { return SettingsFloatMapGeneralMajor["FallspeedMultiplierMinThreshold"]; }
+	double GetFallspeedMultiplierMaxThreshold() { return SettingsFloatMapGeneralMajor["FallspeedMultiplierMaxThreshold"]; }
+	double GetFallspeedMultiplierDownRate() { return SettingsFloatMapGeneralMajor["FallspeedMultiplierDownRate"]; }
+	double GetFallspeedMultiplierUpRate() { return SettingsFloatMapGeneralMajor["FallspeedMultiplierUpRate"]; }
+	double GetJumpMultiplier() { return SettingsFloatMapGeneralMajor["FirstJumpMultiplier"]; }
+	double GetSprintPowerRatio() { return SettingsFloatMapGeneralMajor["SprintPowerRatio"]; }
+	int    GetSlidingBonusCount() { return SettingsIntMapGeneralMajor["SlidingBonusCount"]; }
 
 	//GeneralMinor
+	int GetTimePerFrame() { return SettingsIntMapGeneralMinor["TimePerFrame"]; }
 	//Debug
 	int GetLogLevel() { return SettingsIntMapDebug["LogLevel"]; }
 
@@ -141,6 +159,19 @@ If you are unsure, please re-download the file for this mod or otherwise restore
 			return &SettingsIntMapDebug;
 
 		std::unordered_map<std::string, int> result;
+		return &result;
+	}
+
+	std::unordered_map<std::string, double>* GetFloatMapByCategory(std::string category)
+	{
+		if (category == "GeneralMajor")
+			return &SettingsFloatMapGeneralMajor;
+		else if (category == "GeneralMinor")
+			return &SettingsFloatMapGeneralMinor;
+		else if (category == "Debug")
+			return &SettingsFloatMapDebug;
+
+		std::unordered_map<std::string, double> result;
 		return &result;
 	}
 
@@ -185,4 +216,21 @@ If you are unsure, please re-download the file for this mod or otherwise restore
 			}
 		}
 	}
+
+	void ReadConfigFloat(std::string category, std::string name)
+	{
+		auto map = GetFloatMapByCategory(category);
+		if (tomlParseError)
+			return;
+		std::string value = TomlConfig[category][name].value_or("");
+		if (value != "") {
+			try {
+				(*map)[name] = stof(value);
+				Debug(fmt::format("{}: Category:{}, SettingName:{}, ConfigFileValue:{}, Settings:{}", Plugin::NAME.data(), category, name, value, (*map)[name]));
+			} catch (std::exception const& e) {
+				Error(fmt::format("can't parse value:{} to float in Category:{}, SettingName:{}", value, category, name));
+			}
+		}
+	}
+
 }

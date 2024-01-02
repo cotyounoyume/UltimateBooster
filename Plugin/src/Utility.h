@@ -35,6 +35,7 @@ namespace Utility
 	RE::TESObjectMISC*  GetMiscFromID(int formID, int modIndex);
 	RE::TESObjectWEAP*  GetWeaponFromString(std::string editorID);
 	RE::TESBoundObject* GetWeaponFromID(int formID, int modIndex);
+	RE::TESGlobal*      GetGlobalFromString(std::string editorID);
 	bool                IsMenuOpen(std::string MenuName, bool DialogOnly = true);
 	bool                IsMenuOthersOpen();
 	bool                IsMenuForSystemOpen();
