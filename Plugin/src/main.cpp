@@ -1,6 +1,7 @@
 #pragma once
 #include "Common.h"
 #include "Event.h"
+#include "SpeedManager.h"
 
 // SFSE message listener, use this to do stuff at specific moments during runtime
 void Listener(SFSE::MessagingInterface::Message* message) noexcept
@@ -15,7 +16,7 @@ namespace Main
 	static DWORD MainLoop(void* unused)
 	{
 		Info("Main Start");
-//		StrippingArmor::MainLoop();
+		SpeedManager::MainLoop();
 		return 0;
 	}
 }

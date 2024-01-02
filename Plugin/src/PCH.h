@@ -85,6 +85,7 @@
 #include <syncstream>
 #include <system_error>
 #include <thread>
+#include <toml++/toml.h>
 #include <tuple>
 #include <type_traits>
 #include <typeindex>
@@ -96,7 +97,6 @@
 #include <variant>
 #include <vector>
 #include <version>
-#include <toml++/toml.h>
 
 // Clib
 #include "RE/Starfield.h"
