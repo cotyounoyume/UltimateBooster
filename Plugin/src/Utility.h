@@ -42,11 +42,17 @@ namespace Utility
 	bool                IsMenuForTradeOpen();
 	bool                IsMenuForTerminalOpen();
 	bool                IsMenuInGameOpen();
+	bool                IsKeyPressedMult(char key1, char key2);
+	bool                IsKeyPressed(char key);
+
 	bool                HasKeyword(RE::TESObjectARMO* armor, std::string keyword);
 	bool                HasKeyword(RE::TESBoundObject* item, std::string keyword);
 	bool                HasKeyword(RE::TESObjectWEAP* weapon, std::string keyword);
 	bool                HasKeyword(RE::TESObjectMISC* item, std::string keyword);
 	bool                HasKeyword(RE::TESObjectREFR* member, std::string keyword);
+	RE::TESObjectREFR*  GetPlayer();
+	RE::Actor*          GetPlayerActor();
+
 
 	std::unordered_map<RE::TESBoundObject*, int> CollectInventoryItems(RE::TESObjectREFR* actor, std::string itemType);
 	std::unordered_map<RE::TESObjectARMO*, int>  CollectInventoryArmors(RE::TESObjectREFR* actor);

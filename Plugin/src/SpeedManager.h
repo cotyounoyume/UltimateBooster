@@ -7,11 +7,12 @@ namespace SpeedManager
 {
 	void        MainLoop();
 	void        InitOnce();
+	void        ResetParameter();
 	void        ToogleSpeedManagerKey();
 	bool        IsKeyPressed();
 	bool        CheckSpeedControllerEnabled();
 	void        SpeedAdjust();
-	void        CommonAdjuster(double* var, double max, double min, double upRate, double downRate, std::string type, double sign);
+	void        CommonAdjuster(double* var, double max, double min, double upRate, double downRate, std::string type, double sign, bool reset = false);
 	void        DebugPrint();
 	void        StartScript();
 	void        StopScript();

@@ -1,9 +1,11 @@
 #pragma once
 #include "Common.h"
-#include "winuser.h"
+//#include "winuser.h"
 
 namespace Config
 {
+	inline bool                       EsmCheck = true;
+	inline std::string                UniqueEditorID = "SPJumpState";
 	inline toml::v3::ex::parse_result TomlConfig;
 	inline std::vector<std::string>   Categories = {
         "GeneralMajor",
@@ -14,9 +16,11 @@ namespace Config
 
 	inline std::unordered_map<std::string, bool> SettingsBoolMapGeneralMajor = {
 		{ "EffectShaderForSpeedupOn", true },
+		{ "EsmNotLoadCheckOn", false },
 	};
 	inline std::unordered_map<std::string, std::string> SettingsStringMapGeneralMajor = {
-		{ "SpeedManagerKey", "T" },
+		{ "SpeedManagerKey1", "T" },
+		{ "SpeedManagerKey2", "T" },
 		{ "EffectShaderFormIDForSpeedUp", "000ef400" },
 	};
 	inline std::unordered_map<std::string, int> SettingsIntMapGeneralMajor = {
@@ -37,8 +41,19 @@ namespace Config
 		{ "FirstJumpMultiplier", 3.0 },
 	};
 
-	inline std::unordered_map<std::string, bool>        SettingsBoolMapGeneralMinor = {};
-	inline std::unordered_map<std::string, std::string> SettingsStringMapGeneralMinor = {};
+	inline std::unordered_map<std::string, bool>        SettingsBoolMapGeneralMinor = 
+	{
+		{
+			"FxWwiseEffectOn", true
+		},
+	};
+
+	inline std::unordered_map<std::string, std::string> SettingsStringMapGeneralMinor = 
+	{
+		{
+			"FxWwiseEffectID", "OBJ_MQ104B_Computer_Repair"
+		}
+	};
 	inline std::unordered_map<std::string, double>      SettingsFloatMapGeneralMinor = {};
 
 	inline std::unordered_map<std::string, int> SettingsIntMapGeneralMinor = {
@@ -56,11 +71,16 @@ namespace Config
 	void        SetTomlPath();
 	void        DumpSettings();
 	int         GetLogLevel();
-	std::string GetSpeedManagerKey();
-	std::string GetEffectFormID();
-	bool        GetEffectEnabled();
-	char        GetSpeedManagerKeyNumber();
-	int         GetTimePerFrame();
+	std::string                                   GetSpeedManagerKey1();
+	std::string                                   GetSpeedManagerKey2();
+	std::string                                   GetEffectFormID();
+	std::string                                   GetWwiseEffectID();
+	bool                                          GetEffectEnabled();
+	bool                                          EsmNotLoadCheckEnabled();
+	bool                                          GetWwiseEffectEnabled();
+	char                                          GetSpeedManagerKeyNumber1();
+	char                                          GetSpeedManagerKeyNumber2();
+	int                                           GetTimePerFrame();
 	int         GetSlidingBonusCount();
 	double      GetCrouchPowerRatio();
 	double      GetSprintPowerRatio();
@@ -73,6 +93,7 @@ namespace Config
 	double      GetFallspeedMultiplierMaxThreshold();
 	double      GetFallspeedMultiplierDownRate();
 	double      GetFallspeedMultiplierUpRate();
+	void                                          EsmNotLoadCheck();
 
 	std::unordered_map<std::string, bool>*        GetBoolMapByCategory(std::string category);
 	std::unordered_map<std::string, std::string>* GetStringMapByCategory(std::string category);

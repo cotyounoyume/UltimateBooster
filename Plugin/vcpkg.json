@@ -5,7 +5,11 @@
     "description": "sfse plugin for starfield",
     "homepage": "https://github.com/cotyounoyume/UltimateBooster",
     "dependencies": [
-        "spdlog",
+        {
+            "name": "spdlog",
+            "features": ["wchar"],
+            "default-features": false
+        },
         "nlohmann-json",
         "simpleini",
         "tomlplusplus",
