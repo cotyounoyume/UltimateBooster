@@ -74,6 +74,23 @@ If you are unsure, please re-download the file for this mod or otherwise restore
 		U::SetLogLevel(GetLogLevel());
 	}
 
+	void EsmNotLoadCheck()
+	{
+		Info(fmt::format("Debug EsmNotLoadCheck start"));
+		if (!EsmNotLoadCheckEnabled())
+			return;
+		if (!EsmCheck)
+			return;
+		auto form = RE::TESForm::LookupByEditorID(UniqueEditorID);
+		std::string name = Plugin::NAME.data();
+		std::string msg1 = "ERROR::There is an error about the " + name + "._ ";
+		std::string msg2 = name + ".esm cannot be found._ Perhaps you have failed to install the Plugin.txt Enabler or have made a mistake in its configuration._ Please review the Plugin.txt Enabler and its settings.";
+		std::string msg = msg1 + msg2;
+		if (!form)
+			Utility::ExecuteCommandString(fmt::format("cgf \"debug.messagebox\" \"{}\"", msg));
+		Info(fmt::format("Debug EsmNotLoadCheck finish"));
+	}
+
 	void DumpSettings()
 	{
 		for (auto category : Categories) {
@@ -95,15 +112,31 @@ If you are unsure, please re-download the file for this mod or otherwise restore
 	}
 
 	//GeneralMajor
-	std::string GetSpeedManagerKey() { return SettingsStringMapGeneralMajor["SpeedManagerKey"]; }
+	std::string GetSpeedManagerKey1() { return SettingsStringMapGeneralMajor["SpeedManagerKey1"]; }
+	std::string GetSpeedManagerKey2() { return SettingsStringMapGeneralMajor["SpeedManagerKey2"]; }
 	std::string GetEffectFormID() { return SettingsStringMapGeneralMajor["EffectShaderFormIDForSpeedUp"]; }
+	std::string GetWwiseEffectID() { return SettingsStringMapGeneralMinor["FxWwiseEffectID"]; }
 
-	char GetSpeedManagerKeyNumber()
+	char GetSpeedManagerKeyNumber1()
 	{
-		return SettingsStringMapGeneralMajor["SpeedManagerKey"].c_str()[0];
+		if (SettingsStringMapGeneralMajor["SpeedManagerKey1"] == "None")
+			return 0;
+		return SettingsStringMapGeneralMajor["SpeedManagerKey1"].c_str()[0];
+	}
+	char GetSpeedManagerKeyNumber2()
+	{
+		if (SettingsStringMapGeneralMajor["SpeedManagerKey2"] == "SHIFT")
+			return 0x10;
+		if (SettingsStringMapGeneralMajor["SpeedManagerKey2"] == "CTRL")
+			return 0x11;
+		if (SettingsStringMapGeneralMajor["SpeedManagerKey2"] == "ALT")
+			return 0x12;
+		return 0;
 	}
 
 	bool GetEffectEnabled() { return SettingsBoolMapGeneralMajor["EffectShaderForSpeedupOn"]; }
+	bool EsmNotLoadCheckEnabled() { return SettingsBoolMapGeneralMajor["EsmNotLoadCheckOn"]; };
+	bool GetWwiseEffectEnabled() { return SettingsBoolMapGeneralMinor["FxWwiseEffectOn"]; }
 
 	double GetMultiplierMinThreshold() { return SettingsFloatMapGeneralMajor["MultiplierMinThreshold"]; }
 	double GetMultiplierMaxThreshold() { return SettingsFloatMapGeneralMajor["MultiplierMaxThreshold"]; }

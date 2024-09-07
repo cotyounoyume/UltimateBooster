@@ -66,11 +66,49 @@ namespace Utility
 		Notification(message, true);
 	}
 
+	RE::TESObjectREFR* GetPlayer()
+	{
+		auto playerForm = RE::TESForm::LookupByID(0x14);
+		if (playerForm == nullptr) {
+			Error(fmt::format("Can't get player form."));
+			return nullptr;
+		}
+
+		auto player = static_cast<RE::TESObjectREFR*>(playerForm);
+		if (player == nullptr) {
+			Error(fmt::format("Can't get player ref."));
+			return nullptr;
+		}
+		return player;
+	}
+
+	RE::Actor* GetPlayerActor()
+	{
+		auto playerForm = RE::TESForm::LookupByID(0x14);
+		if (playerForm == nullptr) {
+			Error(fmt::format("Can't get player form."));
+			return nullptr;
+		}
+
+		auto player = static_cast<RE::Actor*>(playerForm);
+		if (player == nullptr) {
+			Error(fmt::format("Can't get player actor ref."));
+			return nullptr;
+		}
+		return player;
+	}
+
 	bool InGameScene(bool withOutMenu)
 	{
 		auto* player = RE::PlayerCharacter::GetSingleton();
 		if (player == nullptr)
 			return false;
+		if (!RE::UI::GetSingleton()->IsMenuOpen("HUDMenu"))
+			return false;
+
+		if (RE::UI::GetSingleton()->IsMenuOpen("EndGameCreditsMenu"))
+			return false;
+
 		if (withOutMenu)
 			return true;
 
@@ -133,6 +171,26 @@ namespace Utility
 		if (IsMenuOthersOpen())
 			result = false;
 		return result;
+	}
+
+	bool IsKeyPressedMult(char key1, char key2)  //key2: {"SHIFT": 0x10, "CTRL": 0x11, "ALT": 0x12, "OTHER": 0x0
+	{
+		if (key1 == 0 && key2 == 0)
+			return false;
+
+		bool result1 = key1 == 0 ? true : false;
+		bool result2 = key2 == 0 ? true : false;
+
+		if (key1 != 0)
+			result1 = (SFSE::WinAPI::GetKeyState(key1) & 0x8000) ? true : false;
+		if (key2 != 0)
+			result2 = (SFSE::WinAPI::GetKeyState(key2) & 0x8000) ? true : false;
+		return result1 && result2;
+	}
+
+	bool IsKeyPressed(char key)
+	{
+		return (SFSE::WinAPI::GetKeyState(key) & 0x8000) ? true : false;
 	}
 
 	std::vector<int> DecomposeSlot(uint32_t value)

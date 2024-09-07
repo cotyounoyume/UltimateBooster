@@ -8,15 +8,23 @@ namespace SpeedManager
 		bool atOnce = true;
 		while (true) {
 			Sleep(Config::GetTimePerFrame());
-			if (SlidingBonusCount > 0) {
-				Info(fmt::format("SlidingBonusCount:{}", SlidingBonusCount));
-				SlidingBonusCount--;
-			}
 			if (!Utility::InGameScene())
 				continue;
+
+			if (SlidingBonusCount > 0) {
+				Debug(fmt::format("SlidingBonusCount:{}", SlidingBonusCount));
+				SlidingBonusCount--;
+			}
+
 			if (atOnce) {
 				InitOnce();
 				atOnce = false;
+			}
+
+			if (Events::NeedReset) {
+				StopScript();
+				ResetParameter();
+				continue;
 			}
 
 			ToogleSpeedManagerKey();
@@ -42,6 +50,9 @@ namespace SpeedManager
 			if (Config::GetEffectEnabled()) {
 				Utility::ExecuteCommandStringOnFormID(0x14, fmt::format("pms {} 1000", Config::GetEffectFormID()));
 			}
+			if (Config::GetWwiseEffectEnabled()) {
+				Utility::ExecuteCommandString(fmt::format("cgf \"WwiseEvent.PlayMenuSound\" \"{}\"", Config::GetWwiseEffectID()));
+			}
 		}
 	}
 
@@ -55,6 +66,8 @@ namespace SpeedManager
 			Jumped = false;
 			RestoreJumpBonus();
 			SetAV(0x14, "jumpMult", "0");
+			CommonAdjuster(&SpeedMultiplierDiff, 0, 0, 0, 0, "SPEEDMULT", 1.0, true);
+			CommonAdjuster(&FallspeedMultiplierDiff, 0, 0, 0, 0, "FALLSPEEDMULT", -1.0, true);
 
 			PLAYER->SetActorValue(*(RE::ActorValue::GetSingleton()->fallSpeedMult), BaseFallspeedMultiplier);
 			if (Config::GetEffectEnabled()) {
@@ -65,8 +78,13 @@ namespace SpeedManager
 
 	void InitOnce()
 	{
+		Config::EsmNotLoadCheck();
+
 		Info("InitOnce start.");
 		PLAYER = RE::PlayerCharacter::GetSingleton();
+		if (PLAYER && PLAYER->formID != 0x14) {
+			PLAYER = RE::PlayerCharacter::GetSingleton();
+		}
 		BaseSpeedMultiplier = PLAYER->GetBaseActorValue(*(RE::ActorValue::GetSingleton()->speedMult));
 		BaseFallspeedMultiplier = PLAYER->GetBaseActorValue(*(RE::ActorValue::GetSingleton()->fallSpeedMult));
 		SetAV(0x14, "jumpMult", "0");
@@ -86,8 +104,18 @@ namespace SpeedManager
 		Info("InitOnce done.");
 	}
 
+	void ResetParameter()
+	{
+		Debug(fmt::format("ResetParameter"));
+		Events::NeedReset = false;
+		ResetFirstJumpMult();
+		InitOnce();
+	}
+
 	void ToogleSpeedManagerKey()
 	{
+		if (Utility::IsMenuOthersOpen())
+			return;
 		if (IsKeyPressed()) {
 			SpeedUpKeyOn = !SpeedUpKeyOn;
 			if (SpeedUpKeyOn) {
@@ -103,7 +131,7 @@ namespace SpeedManager
 			skipCount--;
 			return false;
 		}
-		bool result = SFSE::WinAPI::GetKeyState(Config::GetSpeedManagerKeyNumber()) & 0x8000;
+		bool result = Utility::IsKeyPressedMult(Config::GetSpeedManagerKeyNumber1(), Config::GetSpeedManagerKeyNumber2());
 		if (result)
 			skipCount = skipCountPlus;
 		return result;
@@ -139,7 +167,7 @@ namespace SpeedManager
 			}
 			Jumped = true;
 			ReadyForJump = false;
-			Info("Jumped => true");
+			Debug("Jumped => true");
 			ResetFirstJumpMult();
 			SpeedAdjust();
 		}
@@ -195,9 +223,11 @@ namespace SpeedManager
 		return SPWalkState->GetValue() >= 100;
 	}
 
-	void CommonAdjuster(double* var, double max, double min, double upRate, double downRate, std::string type, double sign)
+	void CommonAdjuster(double* var, double max, double min, double upRate, double downRate, std::string type, double sign, bool reset)
 	{
-		if (SpeedUpKeyOn && IsJumping()) {
+		if (reset) {
+			*var = 0;
+		} else if(SpeedUpKeyOn && IsJumping()) {
 			if (*var == 0) {
 				*var = max * GetInitialSpeedRatio();
 			} else if (*var > max) {
@@ -213,7 +243,7 @@ namespace SpeedManager
 			}
 		}
 		if (Config::GetLogLevel() == 0)
-			Info(fmt::format("debug:type:{}, var:{}, max:{}, min:{}, upRate:{}, downRate:{}, sign:{}", type, *var, max, min, upRate, downRate, sign));
+			Info(fmt::format("debug:type:{}, var:{}, max:{}, min:{}, upRate:{}, downRate:{}, sign:{}, reset:{}", type, *var, max, min, upRate, downRate, sign, reset));
 		if (type == "SPEEDMULT") {
 			PLAYER->SetActorValue(*(RE::ActorValue::GetSingleton()->speedMult), BaseSpeedMultiplier + *var * sign);
 		} else if (type == "FALLSPEEDMULT") {
@@ -288,7 +318,7 @@ namespace SpeedManager
 			double extraRatio = ratio;
 			if (SlidingBonusCount > 0) {
 				extraRatio = 1.0;
-				Info("Ratio Max");
+				Debug("Ratio Max");
 			} else if (SPWalkState->GetValue() >= 10) {
 				extraRatio = (ratio + Config::GetSprintPowerRatio()) / 2;
 			} else if (SPWalkState->GetValue() >= 100) {
