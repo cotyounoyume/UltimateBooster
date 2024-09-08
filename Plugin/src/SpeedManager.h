@@ -2,6 +2,8 @@
 #include "Common.h"
 #include "Config.h"
 #include "Event.h"
+#include "SFSE/InputMap.h"
+#include "RE/Starfield.h"
 
 namespace SpeedManager
 {

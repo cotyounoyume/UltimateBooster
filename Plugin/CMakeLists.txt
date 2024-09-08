@@ -99,6 +99,7 @@ target_link_libraries(
 		CommonLibSF::CommonLibSF
 		spdlog::spdlog
 		nlohmann_json::nlohmann_json
+		XInput.lib
 )
 
 # compiler def
@@ -158,10 +159,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 # update deployments
-add_custom_command(
-	TARGET 
-	${PROJECT_NAME} 
-	POST_BUILD
-	COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File 
-		"${CMAKE_CURRENT_SOURCE_DIR}/!update.ps1" "DISTRIBUTE" "${PROJECT_VERSION}" "${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)" "${PROJECT_NAME}" 
-)
+# add_custom_command(
+#	TARGET 
+#	${PROJECT_NAME} 
+#	POST_BUILD
+#	COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File 
+#		"${CMAKE_CURRENT_SOURCE_DIR}/!update.ps1" "DISTRIBUTE" "${PROJECT_VERSION}" "${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)" "${PROJECT_NAME}" 
+#)

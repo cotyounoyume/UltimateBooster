@@ -116,6 +116,21 @@ If you are unsure, please re-download the file for this mod or otherwise restore
 	std::string GetSpeedManagerKey2() { return SettingsStringMapGeneralMajor["SpeedManagerKey2"]; }
 	std::string GetEffectFormID() { return SettingsStringMapGeneralMajor["EffectShaderFormIDForSpeedUp"]; }
 	std::string GetWwiseEffectID() { return SettingsStringMapGeneralMinor["FxWwiseEffectID"]; }
+	std::string GetControllerButton() { return SettingsStringMapGeneralMajor["ControllerButton"]; }
+
+	uint32_t GetControllerButtonCode() {
+	    std::string button = GetControllerButton();
+	    if (button == "A") return SFSE::InputMap::kGamepadButtonOffset_A;
+	    if (button == "B") return SFSE::InputMap::kGamepadButtonOffset_B;
+	    if (button == "X") return SFSE::InputMap::kGamepadButtonOffset_X;
+	    if (button == "Y") return SFSE::InputMap::kGamepadButtonOffset_Y;
+	    if (button == "LB") return SFSE::InputMap::kGamepadButtonOffset_LEFT_SHOULDER;
+	    if (button == "RB") return SFSE::InputMap::kGamepadButtonOffset_RIGHT_SHOULDER;
+	    if (button == "LT") return SFSE::InputMap::kGamepadButtonOffset_LT;
+	    if (button == "RT") return SFSE::InputMap::kGamepadButtonOffset_RT;
+	    // 他のボタンも必要に応じて追加
+	    return 0;  // 未知のボタン
+	}
 
 	char GetSpeedManagerKeyNumber1()
 	{

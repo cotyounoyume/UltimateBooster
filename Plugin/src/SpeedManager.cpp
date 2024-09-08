@@ -1,7 +1,23 @@
 #include "SpeedManager.h"
+#include <Windows.h>
+#include <Xinput.h>
 
 namespace SpeedManager
 {
+    // XInputのステート
+    XINPUT_STATE xinputState;
+
+    bool IsGamepadButtonPressed(WORD button) {
+        // コントローラー0（プレイヤー1）の状態を取得
+        DWORD result = XInputGetState(0, &xinputState);
+        
+        if (result == ERROR_SUCCESS) {
+            // ボタンが押されているかチェック
+            return (xinputState.Gamepad.wButtons & button) != 0;
+        }
+        
+        return false;
+    }
 	void MainLoop()
 	{
 		Config::ReadIni();
@@ -127,14 +143,35 @@ namespace SpeedManager
 
 	bool IsKeyPressed()
 	{
-		if (skipCount > 0) {
-			skipCount--;
-			return false;
-		}
-		bool result = Utility::IsKeyPressedMult(Config::GetSpeedManagerKeyNumber1(), Config::GetSpeedManagerKeyNumber2());
-		if (result)
-			skipCount = skipCountPlus;
-		return result;
+	    if (skipCount > 0) {
+	        skipCount--;
+	        return false;
+	    }
+    
+	    // キーボード入力のチェック
+	    bool keyboardPressed = Utility::IsKeyPressedMult(Config::GetSpeedManagerKeyNumber1(), Config::GetSpeedManagerKeyNumber2());
+    
+	    // コントローラー入力のチェック
+	    bool controllerPressed = false;
+	    uint32_t buttonCode = Config::GetControllerButtonCode();
+	    if (buttonCode != 0) {
+	        WORD xInputButton = 0;
+	        switch (buttonCode) {
+	            case SFSE::InputMap::kGamepadButtonOffset_A: xInputButton = XINPUT_GAMEPAD_A; break;
+	            case SFSE::InputMap::kGamepadButtonOffset_B: xInputButton = XINPUT_GAMEPAD_B; break;
+	            case SFSE::InputMap::kGamepadButtonOffset_X: xInputButton = XINPUT_GAMEPAD_X; break;
+	            case SFSE::InputMap::kGamepadButtonOffset_Y: xInputButton = XINPUT_GAMEPAD_Y; break;
+	            case SFSE::InputMap::kGamepadButtonOffset_LEFT_SHOULDER: xInputButton = XINPUT_GAMEPAD_LEFT_SHOULDER; break;
+	            case SFSE::InputMap::kGamepadButtonOffset_RIGHT_SHOULDER: xInputButton = XINPUT_GAMEPAD_RIGHT_SHOULDER; break;
+	            // 他のボタンも同様に追加
+	        }
+	        controllerPressed = IsGamepadButtonPressed(xInputButton);
+	    }
+    
+	    bool result = keyboardPressed || controllerPressed;
+	    if (result)
+	        skipCount = skipCountPlus;
+	    return result;
 	}
 
 	bool CheckSpeedControllerEnabled()
