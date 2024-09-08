@@ -22,6 +22,7 @@ namespace Config
 		{ "SpeedManagerKey1", "T" },
 		{ "SpeedManagerKey2", "T" },
 		{ "EffectShaderFormIDForSpeedUp", "000ef400" },
+		{ "ControllerButton", "RB" },  // デフォルト値としてRBを設定
 	};
 	inline std::unordered_map<std::string, int> SettingsIntMapGeneralMajor = {
 		{ "SlidingBonusCount", 20 },
@@ -75,6 +76,8 @@ namespace Config
 	std::string                                   GetSpeedManagerKey2();
 	std::string                                   GetEffectFormID();
 	std::string                                   GetWwiseEffectID();
+	std::string                                   GetControllerButton();
+	uint32_t                                      GetControllerButtonCode();
 	bool                                          GetEffectEnabled();
 	bool                                          EsmNotLoadCheckEnabled();
 	bool                                          GetWwiseEffectEnabled();
